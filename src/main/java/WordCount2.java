@@ -156,7 +156,7 @@ public class WordCount2 {
     {
         int t = 0;
         private Text left=new Text();
-@Override
+
         public void reduce(IntWritable key, Iterable<Text> values,
                            Context context
         ) throws IOException, InterruptedException
