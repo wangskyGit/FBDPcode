@@ -85,7 +85,10 @@ public static class SortMapper2
         }
     }
 ```
-
+为了实现从大到小的排序有多种方法可以实现：
+1. 修改基础数据类型中的compareTo函数
+2. 修改SortComparatorClass
+这里选用第二种方法，重载了SortComparatorClass中的compare函数，在原来的结果前面加上负号
 reduce函数：设计一个变量t计数
 
 ```java
@@ -167,8 +170,8 @@ BDkit运行yarn截图，结果放在/output/output-BDkit里面
 
 两次运行结果一致
 
-![image-20201026215529024](C:\Users\wangs\AppData\Roaming\Typora\typora-user-images\image-20201026215529024.png)
+![image-20201026215529024](image-20201026215529024.png)
 
-![image-20201026215546964](C:\Users\wangs\AppData\Roaming\Typora\typora-user-images\image-20201026215546964.png)
+![image-20201026215546964](image-20201026215546964.png)
 
-![image-20201026220900311](C:\Users\wangs\AppData\Roaming\Typora\typora-user-images\image-20201026220900311.png)
+![image-20201026220900311](image-20201026220900311.png)
