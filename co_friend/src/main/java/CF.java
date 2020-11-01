@@ -197,6 +197,7 @@ public class CF {
         job1.setReducerClass(MergeReducer.class);
         job1.setOutputKeyClass(Text.class);
         job1.setOutputValueClass(Text.class);
+        job1.setJarByClass(CF.class);
         List<String> otherArgs = new ArrayList<String>();
         for (int i = 0; i < remainingArgs.length; ++i) {
             otherArgs.add(remainingArgs[i]);
@@ -211,6 +212,7 @@ public class CF {
         findCF.setPartitionerClass(CFPartition.class);
         findCF.setOutputKeyClass(Pair.class);
         findCF.setOutputValueClass(Text.class);
+        findCF.setJarByClass(CF.class);
         FileOutputFormat.setOutputPath(findCF, new Path(otherArgs.get(1)));
         findCF.waitForCompletion(true);
         System.exit(findCF.waitForCompletion(true) ? 0 : 1);
