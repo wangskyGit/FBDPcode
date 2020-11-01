@@ -295,3 +295,43 @@ public static class CFReducer_no_pair
 
 
 两次job是迭代运行的，运行时设置好tempdir文件夹就可以了
+
+:pen:    注意一定要设置job.setJarByClass这个配置，否则在打包好jar之后，运行时会找不到定义的类
+
+
+
+## 在BDkit上面运行
+
+设置好jar之后直接在BDkit上面运行：
+
+首先是没有用自定义pair的方法：
+
+```shell
+root@wsq181870207-master:/workspace/FBDPcode/co_friend# hadoop jar ./target/co_friend-2.0.jar CF_no_pair input output
+```
+
+
+
+结果如下：
+
+![](.\image\222919.jpg)
+
+然后是使用了自定义pair的方法：
+
+```shell
+root@wsq181870207-master:/workspace/FBDPcode/co_friend# hadoop jar ./target/co_friend-2.0.jar CF_no_pair input output
+```
+
+
+
+结果如下
+
+![](.\image\223321.jpg)
+
+
+
+在yarn上面的截图：
+
+一共四个job如下
+
+![](.\image\223510.jpg)
