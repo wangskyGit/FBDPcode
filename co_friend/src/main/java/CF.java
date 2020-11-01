@@ -20,7 +20,6 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.StringUtils;
 
-
 public class CF {
 
     public static class Pair implements WritableComparable<Pair> {//修改key的定义，a代表字符，b代表其出现的次数
@@ -60,43 +59,39 @@ public class CF {
             b.readFields(in);
         }
 
+        /*public boolean equals(Object right) {
+            if (right == null)
+                return false;
+            if (this == right)
+                return true;
+            if (right instanceof Pair) {
+                Pair r = (Pair) right;
+                return r.getA()== a && r.getB() == b;
+            } else {
+                return false;
+            }
+        }*/
+
         public int compareTo(Pair p) {
             if(this.a.toString().equals(p.getA().toString())){
-                return this.a.compareTo(p.getA());
+                return this.b.compareTo(p.getB());
         }
             else
-                return this.b.compareTo(p.getB());
+                return this.a.compareTo(p.getA());
         }
 
         public int hashCode() {
-            return a.toString().hashCode()+b.toString().hashCode()*47;
+            return a.hashCode()+b.hashCode()*147;
         }//必须把a，b都用上，保证相同的a，b的分到同一个reduce节点上
     }
 
     public class CFPartition extends Partitioner<Pair, NullWritable> {   // override the method
         @Override
         public int getPartition(Pair key, NullWritable value, int numReduceTasks) {
-
             return key.getB().hashCode()+614*key.getA().hashCode();
         }
     }
 
-    public static class GroupingComparator extends WritableComparator//分组函数，只要pair里面的单词相同就在同一组
-    {
-        protected GroupingComparator() {
-            super(Pair.class, true);
-        }
-
-        @Override
-        //Compare two WritableComparables.
-        public int compare(WritableComparable w1, WritableComparable w2) {
-            Pair ip1 = (Pair) w1;
-            Pair ip2 = (Pair) w2;
-            String l = ip1.getA().toString();
-            String r = ip2.getA().toString();
-            return l.compareTo(r);
-        }
-    }
 
     public static class MergeMapper
             extends Mapper<Object, Text, Text, Text> {
@@ -152,6 +147,7 @@ public class CF {
             }
         }
     }
+
     public static class MergeReducer
             extends Reducer<Text, Text, Text, NullWritable> {
         private IntWritable result = new IntWritable();
@@ -177,10 +173,10 @@ public class CF {
             String s=new String("[");
             ArrayList list = new ArrayList();
             for (Text val : values) {
-                if (list.contains(val.toString())||val.equals(key.getA())||val.equals(key.getB())){
+                /*if (list.contains(val.toString())||val.equals(key.getA())||val.equals(key.getB())){
                     continue;
                 }
-                list.add(val.toString());
+                list.add(val.toString());*/
                 s=s+val.toString()+",";
             }
             String outkey= "[";
