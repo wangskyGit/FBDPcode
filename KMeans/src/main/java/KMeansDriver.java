@@ -79,13 +79,15 @@ public class KMeansDriver {
 		System.out.println("start");
 		Configuration conf = new Configuration();
 		int k = Integer.parseInt(args[0]);//类别个数
-		int iterationNum = Integer.parseInt(args[1]);//迭代次数
-		String sourcePath = args[2];
-		String outputPath = k+"_"+iterationNum+args[3];
-		KMeansDriver driver = new KMeansDriver(k, iterationNum, sourcePath, outputPath, conf);
-		driver.generateInitialCluster();
-		System.out.println("initial cluster finished");
-		driver.clusterCenterJob();
-		driver.KMeansClusterJod();
+		for (int i=3;i<=6;i++) {
+			int iterationNum = i;//迭代次数
+			String sourcePath = args[1];
+			String outputPath = k + "_" + iterationNum + args[2];
+			KMeansDriver driver = new KMeansDriver(k, iterationNum, sourcePath, outputPath, conf);
+			driver.generateInitialCluster();
+			System.out.println("initial cluster finished");
+			driver.clusterCenterJob();
+			driver.KMeansClusterJod();
+		}
 	}
 }
