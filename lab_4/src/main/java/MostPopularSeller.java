@@ -10,7 +10,21 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 public class MostPopularSeller{
 
+    public static boolean isNumeric(String str){  
 
+        for (int i = 0; i < str.length(); i++){  
+    
+            if (!Character.isDigit(str.charAt(i))){  
+    
+                return false;  
+    
+             }  
+    
+        }  
+    
+         return true;  
+    
+    }  
     public static class SortMapper2
             extends Mapper<Object,Text,Text,LongWritable>{
 
@@ -23,10 +37,13 @@ public class MostPopularSeller{
             if (fields.length != 9) {
                 return;
             }
-            if (fields[7]=="0"){//如果只是点击，则不计数
+            if (fields[8]=="0"){//如果只是点击，则不计数
                 return;
             }
-            if (Integer.parseInt(fields[1])>3){
+            if (!isNumeric(fields[1])){//去除掉空值或其他违规数据的情况
+                return;
+            }
+            if (Integer.parseInt(fields[1])>3){//只保留年龄小于30的
                 return;
             }
             String item= fields[5];

@@ -10,7 +10,21 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 
 public class MostPopularItem {
+    public static boolean isNumeric(String str){  
 
+        for (int i = 0; i < str.length(); i++){  
+    
+            if (!Character.isDigit(str.charAt(i))){  
+    
+                return false;  
+    
+             }  
+    
+        }  
+    
+         return true;  
+    
+    }  
 
     public static class SortMapper2
             extends Mapper<Object,Text,Text,LongWritable>{
@@ -24,7 +38,10 @@ public class MostPopularItem {
             if (fields.length != 9) {
                 return;
             }
-            if (fields[7]=="0"){//如果只是点击，则不计数
+            if (!isNumeric(fields[8])){//去除掉空值或其他违规数据的情况
+                return;
+            }
+            if (Integer.parseInt(fields[8])==0){//如果只是点击，则不计数
                 return;
             }
             String item= fields[3];
@@ -72,17 +89,6 @@ public class MostPopularItem {
             this.second = second;
         }
     }
-
-    public static class IntWritableDecreasingComparator extends IntWritable.Comparator {
-
-        public int compare(WritableComparable a, WritableComparable b) {
-            return -super.compare(a, b);
-        }
-        public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
-            return -super.compare(b1, s1, l1, b2, s2, l2);
-        }
-    }
-
     public static class SortReducer2
             extends Reducer<Text, LongWritable, Text,LongWritable>
     {
@@ -121,50 +127,7 @@ public class MostPopularItem {
         }
 
     }
-    public static class TokenizerMapper
-            extends Mapper<Object, Text, Text, IntWritable> {
-        private final static IntWritable one = new IntWritable(1);
-        @Override
-        public void map(Object key, Text value, Context context
-        ) throws IOException, InterruptedException {
-            String line = value.toString();
-            Text item_id = new Text();
-            StringTokenizer tokenizer = new StringTokenizer(line,",");
-            int i=0;
-            if (tokenizer.hasMoreTokens())
-            {
-                String next= tokenizer.nextToken();
-                if (i==3)
-                    item_id.set(next);
-                if (i==8 && !next.equals('0'))
-                    context.write(item_id,one);
-                i++;
-            }
-            }
-        }
 
-
-
-    public static class IntSumReducer
-            extends Reducer<Text, IntWritable, Text, IntWritable> {
-        private IntWritable result = new IntWritable();
-
-        public void reduce(Text key, Iterable<IntWritable> values,
-                           Context context
-        ) throws IOException, InterruptedException {
-            int sum = 0;
-            for (IntWritable val : values) {
-                sum += val.get();
-            }
-            result.set(sum);
-            context.write(key, result);
-        }
-    }
-
-    /*
-     * GenericOptionsParser：解释hadoop命令中[genericOptions]部分的一个类
-     * hadoop命令的一般格式：bin/hadoop command [genericOptions] [commandOptions]
-     * */
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
         String sourcePath=args[0];
