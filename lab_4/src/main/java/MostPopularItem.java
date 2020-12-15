@@ -1,8 +1,6 @@
 
 import java.io.*;
 import java.util.*;
-
-import javafx.util.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
@@ -48,8 +46,32 @@ public class MostPopularItem {
 
     }
 
-
-
+    public static class Pair<E extends Object, F extends Object> {
+        private E first;
+        private F second;
+        public Pair(E key,F value){
+            this.first=key;
+            this.second=value;
+        }
+        public E getFirst() {
+            return first;
+        }
+        public E getKey() {
+            return first;
+        }
+        public F getValue() {
+            return second;
+        }
+        public void setFirst(E first) {
+            this.first = first;
+        }
+        public F getSecond() {
+            return second;
+        }
+        public void setSecond(F second) {
+            this.second = second;
+        }
+    }
 
     public static class IntWritableDecreasingComparator extends IntWritable.Comparator {
 
@@ -62,9 +84,9 @@ public class MostPopularItem {
     }
 
     public static class SortReducer2
-            extends Reducer<IntWritable, Text, Text,LongWritable>
+            extends Reducer<Text, LongWritable, Text,LongWritable>
     {
-        public static int K = 30;//选出频次最大的K条关键词
+        public static int K = 100;//选出频次最大的K条关键词
 
         //小顶堆，容量K，用于快速删除词频最小的元素
         PriorityQueue<Pair<String, Long>> minHeap = new PriorityQueue<>((p1, p2) -> (int) (p1.getValue() - p2.getValue()));
