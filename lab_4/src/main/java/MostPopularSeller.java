@@ -37,7 +37,10 @@ public class MostPopularSeller{
             if (fields.length != 9) {
                 return;
             }
-            if (fields[8]=="0"){//如果只是点击，则不计数
+            if (!isNumeric(fields[8])){//去除掉空值或其他违规数据的情况
+                return;
+            }
+            if (Integer.parseInt(fields[8])==0){//如果只是点击，则不计数
                 return;
             }
             if (!isNumeric(fields[1])){//去除掉空值或其他违规数据的情况
