@@ -42,30 +42,29 @@ if __name__ == "__main__":
     data=spark.read.format('csv').option('sep',',').option('header','false').load('/home/wangsky/FBDP/processed_data',schema=Schema1)
     label=spark.read.format('csv').option('sep',',').option('header','false').load('/home/wangsky/FBDP/train_format1.csv',schema=Schema2)
     train_data=label.join(data,['user_id','seller_id'],'left')
-    train_data=train_data.drop('gender')
-    train_data.show(10)
-    train_data=train_data.dropna(how='any')
-    t=train_data.rdd
-    
+    t=train_data.drop('gender').dropna(how='any').rdd
     training,testing=t.randomSplit([0.7,0.3],seed=10)
     training=training.map(lambda line: LabeledPoint(line[2],[line[3:]]))
     testing=testing.map(lambda line: LabeledPoint(line[2],[line[3:]]))
-    print(testing.take(10))
-    print(training.take(10))
     training.cache()
-    
-    svm=SVMWithSGD.train(training,iterations=10)
+    svm=SVMWithSGD.train(training,iterations=25)
     predicted=training.map(lambda x:(x.label,svm.predict(x.features)))
-    print(predicted.take(20))
-    error=predicted.filter(lambda lp:lp[0]!=lp[1]).count()/float(testing.count())
-    print(error)
-    # totalcorrect=testing.map(lambda x:1 if svm.predict(x.features)==x.label else 0).sum()
-    # accuracy=float(totalcorrect)/testing.count()
-    
-    # predicted=testing.map(lambda lp:(float(lsvcmodel.predict(lp.features)),lp.label))
-    # metrix=BinaryClassificationMetrics(predicted)
+    print(predicted.take(5))
+    error=predicted.filter(lambda lp:lp[0]!=lp[1]).count()/float(training.count())
+    print('训练集error：{}'.format(error))
+    test_pre=testing.map(lambda x:(x.label,svm.predict(x.features)))
+    test_error=predicted.filter(lambda lp:lp[0]!=lp[1]).count()/float(testing.count())
+    print('测试集error：{}'.format(test_error))
 
-    
+    test_label=spark.read.format('csv').option('sep',',').option('header','false').load('/home/wangsky/FBDP/test_format1.csv',schema=Schema2)
+    data2=test_label.join(data,['user_id','seller_id'],'left')
+    t2=data2.drop('gender').fillna(0).rdd
+    test_data1=t2.map(lambda line:(line[0],line[1],LabeledPoint(line[2],[line[3:]])))
+    test_data1.cache()
+    test_predicted=test_data1.map(lambda x:(x[0],x[1],svm.predict(x[2].features)))
+    test_predictedDF=test_predicted.toDF(Schema2)
+    print(test_predictedDF.show(5))
+    test_predictedDF.toPandas().to_csv("/home/wangsky/FBDP/out.csv", header=True,index=False)
     
     
     
